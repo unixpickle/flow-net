@@ -107,8 +107,8 @@ class Graph:
             for neighbor in self.neighbors.get(v, []):
                 outgoing = DirectedEdge(v, neighbor)
                 incoming = DirectedEdge(neighbor, v)
-                result[i, self.edge_ids[outgoing]] = -1
-                result[i, self.edge_ids[incoming]] = 1
+                result[i, self.edge_ids[outgoing]] = 1
+                result[i, self.edge_ids[incoming]] = -1
             if v == self.source:
                 result[i, source_var] = -1
             elif v == self.sink:
