@@ -8,7 +8,7 @@ for _ in range(20):
     g.add_random_vertex()
 lhs = g.create_constraint_lhs()
 
-param = nn.Parameter(torch.rand(g.num_edges) * 0.1)
+param = nn.Parameter(torch.rand(g.num_edges))
 opt = torch.optim.Adam([param], lr=0.001)
 step = 0
 while True:
