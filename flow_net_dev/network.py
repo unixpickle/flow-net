@@ -91,6 +91,9 @@ class Graph:
             self.equal_edges.add(
                 (DirectedEdge(neighbors[0], v), DirectedEdge(neighbors[1], v))
             )
+            self.equal_edges.add(
+                (DirectedEdge(v, neighbors[0]), DirectedEdge(v, neighbors[1]))
+            )
 
     def create_constraint_lhs(self) -> torch.Tensor:
         num_vars = (
