@@ -4,7 +4,7 @@ from cvxpylayers.torch import CvxpyLayer
 
 def make_lp_layer(n: int, m: int):
     x = cp.Variable(n, nonneg=True)  # x ≥ 0
-    A = cp.Parameter(m, n)
+    A = cp.Parameter((m, n))
     b = cp.Parameter(m)
     c = cp.Parameter(n)
 

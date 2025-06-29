@@ -16,6 +16,9 @@ class DirectedEdge:
     v1: Vertex
     v2: Vertex
 
+    def __hash__(self) -> int:
+        return hash((self.v1, self.v2))
+
 
 @dataclass
 class Graph:
@@ -48,10 +51,10 @@ class Graph:
         neighbors = {source: set(inputs), sink: set(outputs)}
         edge_ids = {}
         for inp in inputs:
-            neighbors[inp] = source
+            neighbors[inp] = {source}
             edge_ids[DirectedEdge(source, inp)] = len(edge_ids)
         for out in outputs:
-            neighbors[out] = sink
+            neighbors[out] = {sink}
             edge_ids[DirectedEdge(out, sink)] = len(edge_ids)
 
         # Create the opposite edges, though they aren't particularly useful.
@@ -66,14 +69,15 @@ class Graph:
             vs=set(inputs) | set(outputs) | {source, sink},
             neighbors=neighbors,
             edge_ids=edge_ids,
+            equal_edges=set(),
         )
 
     def add_vertex(self, v: Vertex):
-        self.vs.append(v)
+        self.vs.add(v)
 
     def add_edge(self, v1: Vertex, v2: Vertex):
-        self.neighbors[v1] = self.neighbors.get(v1, {}) | {v2}
-        self.neighbors[v2] = self.neighbors.get(v2, {}) | {v1}
+        self.neighbors[v1] = self.neighbors.get(v1, set()) | {v2}
+        self.neighbors[v2] = self.neighbors.get(v2, set()) | {v1}
         self.edge_ids[DirectedEdge(v1, v2)] = len(self.edge_ids)
         self.edge_ids[DirectedEdge(v2, v1)] = len(self.edge_ids)
 
@@ -96,7 +100,7 @@ class Graph:
         sink_var = num_vars - 1
 
         num_constraints = len(self.vs) + len(self.edge_ids) + len(self.equal_edges)
-        result = torch.zeros(num_vars, num_constraints)
+        result = torch.zeros(num_constraints, num_vars)
 
         # All vertex flows (plus source/sink slack) equal zero.
         for i, v in enumerate(self.vs):

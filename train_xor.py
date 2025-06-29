@@ -8,8 +8,9 @@ for _ in range(20):
     g.add_random_vertex()
 lhs = g.create_constraint_lhs()
 
-param = nn.Parameter(torch.rand(g.num_edges))
-opt = torch.optim.Adam([param], lr=0.01)
+param = nn.Parameter(torch.rand(g.num_edges) * 0.1)
+opt = torch.optim.Adam([param], lr=0.001)
+step = 0
 while True:
     loss = 0
     for a in [0, 1]:
@@ -26,4 +27,5 @@ while True:
     loss.backward()
     opt.step()
     opt.zero_grad()
-    print(f"loss={loss}")
+    print(f"step {step}: loss={loss}")
+    step += 1
