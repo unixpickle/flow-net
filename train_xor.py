@@ -4,12 +4,12 @@ import torch.nn as nn
 from flow_net_dev.network import Graph
 
 g = Graph.input_output_graph(num_inputs=2, num_outputs=1)
-for _ in range(20):
+for _ in range(15):
     g.add_random_vertex()
 lhs = g.create_constraint_lhs()
 
 param = nn.Parameter(torch.rand(g.num_edges))
-opt = torch.optim.Adam([param], lr=0.001)
+opt = torch.optim.Adam([param], lr=0.01)
 step = 0
 while True:
     loss = 0
@@ -21,7 +21,6 @@ while True:
                 lhs=lhs,
                 inputs=inputs,
                 capacities=param.abs(),
-                num_outputs=1,
             )
             loss = loss + (out - target).pow(2).sum()
     loss.backward()

@@ -24,8 +24,10 @@ class DirectedEdge:
 class Graph:
     source: Vertex
     sink: Vertex
+    inputs: list[Vertex]
+    outputs: list[Vertex]
 
-    vs: set[Vertex]
+    vs: set[Vertex]  # includes source, sink, inputs, and outputs
     neighbors: dict[Vertex, set[Vertex]]
 
     edge_ids: dict[DirectedEdge, int]
@@ -66,6 +68,8 @@ class Graph:
         return cls(
             source=source,
             sink=sink,
+            inputs=inputs,
+            outputs=outputs,
             vs=set(inputs) | set(outputs) | {source, sink},
             neighbors=neighbors,
             edge_ids=edge_ids,
@@ -82,18 +86,20 @@ class Graph:
         self.edge_ids[DirectedEdge(v2, v1)] = len(self.edge_ids)
 
     def add_random_vertex(self, force_equal_prob: float = 0.5):
+        num_neighbors = random.randrange(3, len(self.vs))
         v = Vertex()
-        neighbors = random.sample(list(self.vs), 3)
+        neighbors = random.sample(list(self.vs), num_neighbors)
         self.add_vertex(v)
         for neighbor in neighbors:
             self.add_edge(v, neighbor)
-        if random.random() < force_equal_prob:
-            self.equal_edges.add(
-                (DirectedEdge(neighbors[0], v), DirectedEdge(neighbors[1], v))
-            )
-            self.equal_edges.add(
-                (DirectedEdge(v, neighbors[0]), DirectedEdge(v, neighbors[1]))
-            )
+        for i in range(0, num_neighbors - 1, 2):
+            if random.random() < force_equal_prob:
+                self.equal_edges.add(
+                    (DirectedEdge(neighbors[i], v), DirectedEdge(neighbors[i + 1], v))
+                )
+                self.equal_edges.add(
+                    (DirectedEdge(v, neighbors[i]), DirectedEdge(v, neighbors[i + 1]))
+                )
 
     def create_constraint_lhs(self) -> torch.Tensor:
         num_vars = (
@@ -151,14 +157,13 @@ class Graph:
         lhs: torch.Tensor,
         inputs: torch.Tensor,
         capacities: torch.Tensor,
-        num_outputs: int,
     ) -> torch.Tensor:
         c = torch.zeros(lhs.shape[1], device=lhs.device, dtype=lhs.dtype)
         c[-1] = 1  # minimize the sink flow => maximize the source flow
 
         use_capacities = capacities.clone()
         use_capacities[: len(inputs)] = inputs
-        rhs = self.create_constraint_rhs(use_capacities)
+        rhs = self.create_constraint_rhs(use_capacities).to(lhs)
 
         lp_layer = make_lp_layer(n=lhs.shape[1], m=lhs.shape[0])
 
@@ -166,4 +171,4 @@ class Graph:
         c[-1] = 1.0
 
         (x_star,) = lp_layer(lhs, rhs, c)
-        return x_star[inputs.shape[0] : inputs.shape[0] + num_outputs]
+        return x_star[inputs.shape[0] : inputs.shape[0] + len(self.outputs)]
