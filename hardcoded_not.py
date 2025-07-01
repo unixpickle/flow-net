@@ -26,7 +26,7 @@ g.add_edge(g.source, v3)
 g.add_edge(v3, g.sink)
 g.equal_edges.add((DirectedEdge(v2, v3), DirectedEdge(g.source, v3)))
 
-param = nn.Parameter(torch.rand(g.num_edges))
+param = nn.Parameter(torch.zeros(g.num_edges))
 with torch.no_grad():
     param[g.edge_ids[DirectedEdge(g.source, v1)]] = 1.0
     param[g.edge_ids[DirectedEdge(v1, g.outputs[0])]] = 1.0
@@ -35,6 +35,7 @@ with torch.no_grad():
     param[g.edge_ids[DirectedEdge(v2, v3)]] = 1.0
     param[g.edge_ids[DirectedEdge(g.source, v3)]] = 1.0
     param[g.edge_ids[DirectedEdge(v3, g.sink)]] = 2.0
+    param[g.edge_ids[DirectedEdge(g.outputs[0], g.sink)]] = 1.0
 
 lhs = g.create_constraint_lhs()
 
@@ -50,8 +51,6 @@ def compute_loss():
         loss = loss + (out - (1 - input)).pow(2)
     return loss
 
-
-print("initial loss", compute_loss())
 
 opt = torch.optim.Adam([param], lr=0.01)
 step = 0
