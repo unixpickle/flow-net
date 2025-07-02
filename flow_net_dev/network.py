@@ -168,7 +168,7 @@ class Graph:
         lp_layer = make_lp_layer(n=lhs.shape[1], m=lhs.shape[0])
 
         c = torch.zeros(lhs.shape[1], device=lhs.device, dtype=lhs.dtype)
-        c[-1] = 1.0
+        c[-1] = -1.0
 
         (x_star,) = lp_layer(lhs, rhs, c)
         return x_star[inputs.shape[0] : inputs.shape[0] + len(self.outputs)]

@@ -9,7 +9,7 @@ for _ in range(15):
 lhs = g.create_constraint_lhs()
 
 param = nn.Parameter(torch.rand(g.num_edges))
-opt = torch.optim.Adam([param], lr=0.01)
+opt = torch.optim.Adam([param], lr=0.001)
 step = 0
 while True:
     loss = 0
