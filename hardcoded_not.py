@@ -49,7 +49,6 @@ def compute_loss():
             capacities=param.abs(),
         )
         loss = loss + (out - (1 - input)).pow(2)
-        break
     return loss
 
 
