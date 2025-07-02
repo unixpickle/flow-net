@@ -18,7 +18,7 @@ g.add_edge(v1, v2)
 g.add_edge(g.inputs[0], v2)
 g.equal_edges.add((DirectedEdge(v1, v2), DirectedEdge(g.inputs[0], v2)))
 
-# # output replicator to flush extra output to sink
+# output replicator to flush extra output to sink
 v3 = Vertex()
 g.add_vertex(v2)
 g.add_edge(v2, v3)

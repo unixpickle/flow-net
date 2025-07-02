@@ -116,12 +116,12 @@ class Graph:
             for neighbor in self.neighbors.get(v, []):
                 outgoing = DirectedEdge(v, neighbor)
                 incoming = DirectedEdge(neighbor, v)
-                result[i, self.edge_ids[outgoing]] = 1
-                result[i, self.edge_ids[incoming]] = -1
+                result[i, self.edge_ids[outgoing]] = -1
+                result[i, self.edge_ids[incoming]] = 1
             if v == self.source:
-                result[i, source_var] = -1
+                result[i, source_var] = 1
             elif v == self.sink:
-                result[i, sink_var] = 1
+                result[i, sink_var] = -1
 
         # Each edge + its slack variable equals capacity
         for i in range(len(self.edge_ids)):
@@ -159,16 +159,13 @@ class Graph:
         capacities: torch.Tensor,
     ) -> torch.Tensor:
         c = torch.zeros(lhs.shape[1], device=lhs.device, dtype=lhs.dtype)
-        c[-1] = 1  # minimize the sink flow => maximize the source flow
+        c[-1] = -1
 
         use_capacities = capacities.clone()
         use_capacities[: len(inputs)] = inputs
         rhs = self.create_constraint_rhs(use_capacities).to(lhs)
 
         lp_layer = make_lp_layer(n=lhs.shape[1], m=lhs.shape[0])
-
-        c = torch.zeros(lhs.shape[1], device=lhs.device, dtype=lhs.dtype)
-        c[-1] = -1.0
 
         (x_star,) = lp_layer(lhs, rhs, c)
         return x_star[inputs.shape[0] : inputs.shape[0] + len(self.outputs)]
