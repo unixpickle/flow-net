@@ -80,6 +80,8 @@ class Graph:
         self.vs.add(v)
 
     def add_edge(self, v1: Vertex, v2: Vertex):
+        assert v1 in self.vs
+        assert v2 in self.vs
         self.neighbors[v1] = self.neighbors.get(v1, set()) | {v2}
         self.neighbors[v2] = self.neighbors.get(v2, set()) | {v1}
         self.edge_ids[DirectedEdge(v1, v2)] = len(self.edge_ids)

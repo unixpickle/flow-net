@@ -20,7 +20,7 @@ g.equal_edges.add((DirectedEdge(v1, v2), DirectedEdge(g.inputs[0], v2)))
 
 # output replicator to flush extra output to sink
 v3 = Vertex()
-g.add_vertex(v2)
+g.add_vertex(v3)
 g.add_edge(v2, v3)
 g.add_edge(g.source, v3)
 g.add_edge(v3, g.sink)
@@ -32,9 +32,9 @@ with torch.no_grad():
     param[g.edge_ids[DirectedEdge(v1, g.outputs[0])]] = 1.0
     param[g.edge_ids[DirectedEdge(v1, v2)]] = 1.0
     param[g.edge_ids[DirectedEdge(g.inputs[0], v2)]] = 1.0
-    param[g.edge_ids[DirectedEdge(v2, v3)]] = 1.0
-    param[g.edge_ids[DirectedEdge(g.source, v3)]] = 1.0
-    param[g.edge_ids[DirectedEdge(v3, g.sink)]] = 2.0
+    param[g.edge_ids[DirectedEdge(v2, v3)]] = 2.0
+    param[g.edge_ids[DirectedEdge(g.source, v3)]] = 2.0
+    param[g.edge_ids[DirectedEdge(v3, g.sink)]] = 4.0
     param[g.edge_ids[DirectedEdge(g.outputs[0], g.sink)]] = 1.0
 
 lhs = g.create_constraint_lhs()
