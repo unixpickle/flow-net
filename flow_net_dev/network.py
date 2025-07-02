@@ -88,7 +88,7 @@ class Graph:
         self.edge_ids[DirectedEdge(v2, v1)] = len(self.edge_ids)
 
     def add_random_vertex(self, force_equal_prob: float = 0.5):
-        num_neighbors = random.randrange(3, len(self.vs))
+        num_neighbors = 3
         v = Vertex()
         neighbors = random.sample(list(self.vs), num_neighbors)
         self.add_vertex(v)
